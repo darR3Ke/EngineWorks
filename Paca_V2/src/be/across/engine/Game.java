@@ -1,40 +1,43 @@
 package be.across.engine;
 
-public class Game {
+import be.across.engine.screen.Screen;
 
+public class Game {
+	
+	private Thread looper;
+
+	public static void main(String[] arghs){
+		init();
+		
+		if (looper == null || !running) {
+			looper = new Thread() {
+				
+			}
+		}
+
+	}
+
+	
+	
+	
 	
 	/*
 	 * Initialize the game
 	 */
-	public void init(){
-		
+	public static void init() {
+		Screen scherm = new Screen();
+		scherm.start();
+	}
+}
+
+
+
+
+
+private void startGame(){
+	if (looper == null || !running) {
+		looper = new Thread(this);
+		looper.start();
 	}
 	
-	/*
-	 * update gamestate
-	 */
-	public void update(){
-		
-	}
-	
-	/*
-	 * render frames to buffer
-	 */
-	public void render(){
-		
-	}
-	
-	/*
-	 * Paint the buffer
-	 */
-	public void paint(){
-		
-	}
-	
-	/*
-	 * dispose of the game
-	 */
-	public void dispose(){
-		
-	}
 }

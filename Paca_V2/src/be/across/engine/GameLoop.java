@@ -1,8 +1,8 @@
 package be.across.engine;
 
+import org.lwjgl.opengl.Display;
+
 public class GameLoop implements Runnable {
-	
-	private Thread looper;
 	
 	private volatile boolean running = false;
 	private volatile boolean gameOver = false;
@@ -16,26 +16,6 @@ public class GameLoop implements Runnable {
 	private static final int MAX_FRAME_SKIP = 5;							// maximum aantal frames dat geskipt mag worden als timeDiff 0 is
 	private int period; 													// timeframe waarin alles moet gebeuren om de juist fps te behouden. wordt berekend. 60FPS --> 1000(miliseconden)/60 = 16 (afgerond door int)
 	
-	
-	
-	
-	/*
-	 * voorlopig constructor om het spel te starten
-	 */
-	public GameLoop(){
-		startGame();
-	}
-	
-	/*
-	 * initialize and start the thread
-	 */
-	private void startGame(){
-		if (looper == null || !running) {
-			looper = new Thread(this);
-			looper.start();
-		}
-		
-	}
 
 	/*
 	 * de daadwerkelijke GameLoop
@@ -116,6 +96,9 @@ public class GameLoop implements Runnable {
 	private void gameUpdate() {
 		if (!isPaused && !gameOver){
 			// hier komt stuff voor het spel
+			if(Display.isCloseRequested()) {
+				stopGame();
+			}
 		}
 	}
 
