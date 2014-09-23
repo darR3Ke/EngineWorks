@@ -6,6 +6,7 @@ public class GameLoop implements Runnable {
 	
 	private volatile boolean running = false;
 	private volatile boolean gameOver = false;
+	private volatile boolean isPaused = false;
 	
 	/*
 	 * waardes die later in een config file zullen komen
@@ -99,13 +100,21 @@ public class GameLoop implements Runnable {
 		running = false;
 	}
 	
+	public void pauseGame(){
+		isPaused = true;
+	}
+	
+	public void resumeGame(){
+		isPaused = false;
+	}
+	
 	
 	
 	/*
 	 * game bewerkingen en opvangen van gebruiker acties
 	 */
 	private void gameUpdate() {
-		if (!gameOver){
+		if (!isPaused && !gameOver){
 			// hier komt stuff voor het spel
 		}
 	}
