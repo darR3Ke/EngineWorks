@@ -1,19 +1,21 @@
 package be.across.engine;
 
+import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 
-import static org.lwjgl.opengl.GL11.*;
-import be.across.engine.draw.Draw;
 import be.across.engine.screen.Screen;
+import be.across.game.Game;
 
 
 public class GameLoop {
 	
-	private volatile boolean running = false;
-	private volatile boolean gameOver = false;
-	private volatile boolean isPaused = false;
+	private static boolean running = false;
+	private static boolean gameOver = false;
+	private static boolean isPaused = false;
 	
-	private static Screen scherm;
+	private static Screen scherm;											// scherm object
+	private static Game game;
 	
 	/*
 	 * waardes die later in een config file zullen komen
@@ -24,34 +26,28 @@ public class GameLoop {
 	*/
 	
 	private static final int MAX_FRAME_SKIP = 5;							// maximum aantal frames dat geskipt mag worden als timeDiff 0 is
-	private long period = 16 * 1000000L; 									// timeframe waarin alles moet gebeuren om de juist fps te behouden. wordt berekend. 60FPS --> 1000(miliseconden)/60 = 16 
+	private static long period = 16 * 1000000L; 									// timeframe waarin alles moet gebeuren om de juist fps te behouden. wordt berekend. 60FPS --> 1000(miliseconden)/60 = 16 
 																			// * 1000000L omzetten milliseconds naar nanoseconds
 	
 	
-	public GameLoop(){
-		init();																// initialize game paramaters
+	public static void main(String[] arghs){
 		initGL();															// initialize openGL
+		initGame();															// initialize game paramaters
 		runGame();															// starting the gameLoop Thread           
 		cleanUp();															// opruimen van objecten en afsluiten van schermen
 	}
 	
-	
-	private void cleanUp() {
-		scherm.stop();
-		System.exit(0);
-	}
-
-
 	/*
 	 * Initialize the game
 	 */
-	public static void init() {
-		scherm = new Screen();
-		scherm.init();
+	public static void initGame() {
+		game = new Game();
 	}	
 	
 	
 	public static void initGL(){
+		scherm = new Screen();
+		scherm.init();
 		scherm.initGL();
 		
 		
@@ -60,7 +56,7 @@ public class GameLoop {
 	/*
 	 * de daadwerkelijke GameLoop
 	 */
-	public void runGame() {
+	public static void runGame() {
 		
 		long beforeTime, afterTime, timeDiff, sleepTime;					// worden gebruikt voor variable sleepTimers
 		long overSleepTime = 0L;
@@ -121,10 +117,20 @@ public class GameLoop {
 		}
 	}
 	
+	
+	/*
+	 * Opruimen van omgeving 
+	 */
+	private static void cleanUp() {
+		scherm.stop();
+		System.exit(0);
+	}
+
+	
 	/*
 	 * einde van het spel door de gebruiker
 	 */
-	public void stopGame(){
+	public static void stopGame(){
 		running = false;
 	}
 	
@@ -141,11 +147,16 @@ public class GameLoop {
 	/*
 	 * game bewerkingen en opvangen van gebruiker acties
 	 */
-	private void gameUpdate() {
+	private static void gameUpdate() {
 		if (!isPaused && !gameOver){
+			
+			game.update();
 
 			// hier komt stuff voor het spel
 			if(Display.isCloseRequested()) {
+				stopGame();
+			}
+			if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)){
 				stopGame();
 			}
 		}
@@ -154,16 +165,17 @@ public class GameLoop {
 	/*
 	 * buffer opvullen met crap
 	 */
-	private void gameRender() {
+	private static void gameRender() {
 		// graphics engine da dingen in de buffer zet
-		Draw.rect(0, 0, 16, 16);
+		scherm.render();
+		game.render();
 		
 	}
 	
 	/*
 	 * buffer naar het scherm painten
 	 */
-	private void paintScreen() {
+	private static void paintScreen() {
 		// buffer naar het scherm sturen
 		scherm.update();
 		

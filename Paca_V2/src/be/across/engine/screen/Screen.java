@@ -1,8 +1,18 @@
 package be.across.engine.screen;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL11.glDisable;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glOrtho;
 
 import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 
@@ -17,6 +27,7 @@ public class Screen {
 		try {
 			Display.setDisplayMode(new DisplayMode(DISPLAY_WIDTH, DISPLAY_HEIGHT));	// instellen van de resolutie van het schermobject dat we gaan aanmaken
 			Display.create();												// aanmaken van een scherm object 
+			Keyboard.create();												// aanmaken Keyboard object om keyboard te ontvangen
 		} catch (LWJGLException e) { e.printStackTrace(); }
 	}
 	
@@ -32,12 +43,20 @@ public class Screen {
 		
 	}
 	
+	public void render(){
+		glClear(GL_COLOR_BUFFER_BIT);										// scherm schoonmaken
+		glLoadIdentity(); 													// matrix schoonmaken
+		
+		
+	}
+	
 	public void update(){
 		Display.update();													// het scherm updaten
 	}
 	
 	public void stop(){
-		Display.destroy();													// het scherm destroyen
+		Display.destroy();													// scherm obj destroyen
+		Keyboard.destroy();													// keyboard obj destroyen
 	}
 
 }
