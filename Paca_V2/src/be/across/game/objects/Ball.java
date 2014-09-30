@@ -1,5 +1,6 @@
 package be.across.game.objects;
 
+
 public class Ball extends GameObject{
 	private static final float SIZE_BALL = 16;
 	private static final float MAX_SPEEDX = 4f;
