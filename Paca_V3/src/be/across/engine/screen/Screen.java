@@ -35,7 +35,6 @@ public class Screen {
 	
 	public void render(){
 		glClear(GL_COLOR_BUFFER_BIT);										// scherm schoonmaken
-		glLoadIdentity(); 													// matrix schoonmaken
 	}
 	
 	public void update(){
