@@ -4,12 +4,21 @@ import be.across.engine.draw.Draw;
 
 public abstract class GameObject {
 	
-	protected float x, y, sx, sy;
+	protected float x, y, sx, sy;					// positie X, positie Y, size X, size Y
+	protected float r, g, b, a;						// rood, groen, blauw, alpha
+	protected String tex;							// texture naam
+	protected boolean texLoaded;					// true als er een texture is
+	
 	
 	public abstract void update();
 	
 	public void render(){
-		Draw.rect(x, y, sx, sy);
+		if (!texLoaded) {
+			Draw.rect(x, y, sx, sy);
+		} else {
+			Draw.tex(x, y, sx, sy, tex);
+		}
+		
 	}
 
 	public float getX() {

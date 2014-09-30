@@ -27,4 +27,8 @@ public class Draw {
 		glPopMatrix(); 														// de matrix terug van de stack halen
 	}
 
+	public static void tex(float x, float y, float sx, float sy, String tex) {
+		
+	}
+
 }
