@@ -18,6 +18,11 @@ import org.lwjgl.opengl.DisplayMode;
 
 public class Screen {
 	
+	
+	public Screen (){
+		this(1024, 768);													// wrapper voor een default scherm resolutie
+		
+	}
 	public Screen(int width, int height){
 		try {
 			Display.setDisplayMode(new DisplayMode(width, height));			// instellen van de resolutie van het schermobject dat we gaan aanmaken
