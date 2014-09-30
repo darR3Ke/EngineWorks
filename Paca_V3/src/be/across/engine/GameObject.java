@@ -6,7 +6,7 @@ public abstract class GameObject {
 	
 	protected float x, y, sx, sy;					// positie X, positie Y, size X, size Y
 	protected float r, g, b, a;						// rood, groen, blauw, alpha
-	protected String tex;							// texture naam
+	protected String texName;							// texture naam
 	protected boolean texLoaded;					// true als er een texture is
 	
 	
@@ -16,7 +16,7 @@ public abstract class GameObject {
 		if (!texLoaded) {
 			Draw.rect(x, y, sx, sy);
 		} else {
-			Draw.tex(x, y, sx, sy, tex);
+			Draw.tex(x, y, sx, sy, texName);
 		}
 		
 	}
@@ -40,5 +40,9 @@ public abstract class GameObject {
 	public float getCenterY(){
 		return y + sy / 2;
 	}
+	
+	 public float getCenterX(){
+		 return x + sx / 2;
+	 }
 
 }
