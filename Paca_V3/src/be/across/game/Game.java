@@ -1,15 +1,27 @@
 package be.across.game;
 
-public class Game {
+import be.across.engine.GameFramework;
 
-	public void render() {
-		// TODO Auto-generated method stub
-		
+public class Game implements GameFramework {
+
+	@Override
+	public void init() {
+
 	}
 
+	@Override
+	public void getInput() {
+
+	}
+
+	@Override
 	public void update() {
-		// TODO Auto-generated method stub
-		
+
+	}
+
+	@Override
+	public void render() {
+
 	}
 
 }

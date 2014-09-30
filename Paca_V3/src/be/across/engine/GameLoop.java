@@ -52,7 +52,8 @@ public class GameLoop {
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 		}
-		game = new Game();													// spel object met alle code 
+		game = new Game();													// spel object met alle code
+		game.init();
 		running = true;														// het spel start met lopen
 	}	
 	
@@ -131,6 +132,7 @@ public class GameLoop {
 	 * game bewerkingen en opvangen van gebruiker acties
 	 */
 	private static void gameUpdate() {
+		game.getInput();
 		if (!isPaused && !gameOver){
 			if(Display.isCloseRequested()) {
 				stopGame();
@@ -138,7 +140,6 @@ public class GameLoop {
 			if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)){
 				stopGame();
 			}
-			
 			game.update();														// scoring en game related code uitvoeren
 		}
 	}
