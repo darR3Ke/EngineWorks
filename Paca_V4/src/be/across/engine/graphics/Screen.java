@@ -5,6 +5,9 @@ import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 
@@ -13,20 +16,28 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.PixelFormat;
 
 public class Screen {
 	private static final Screen instance = new Screen(); // Screen object aanmaken
 	private FloatBuffer vertexBuffer;
 	private ByteBuffer indicesBuffer;
-	private int vaoId;
-	private int vboId;
-	private int vboEId;
+	private FloatBuffer colorBuffer;
+	private int vaoId = 0;
+	private int vboId = 0;
+	private int vboCId = 0;
+	private int vboEId = 0;
+	
+	private int vsId = 0;
+	private int fsId = 0;
+	private int pId = 0;
 
 
-	private static final int VERTEX_SIZE = 3;
+	private static final int VERTEX_SIZE = 4;
 	private static int totalVertexAmount;
 	private static int totalIndicesAmount;
+	private static int totalColorAmount;
 
 	private Screen() { // private constructor voor singleton
 	}
@@ -53,17 +64,22 @@ public class Screen {
 	public void render() {
 
 	//	glClear(GL_COLOR_BUFFER_BIT); // scherm schoonmaken
+		
+		glUseProgram(pId);
 
 		glBindVertexArray(vaoId);
 		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboEId);
 		glDrawElements(GL_TRIANGLES, totalIndicesAmount, GL_UNSIGNED_BYTE, 0);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
 		glBindVertexArray(0);
 
+		glUseProgram(0);
 	}
 
 	public void update() {
@@ -71,6 +87,14 @@ public class Screen {
 	}
 
 	public void stop() {
+		glUseProgram(0);
+		glDetachShader(pId, vsId);
+		glDetachShader(pId, fsId);
+		
+		glDeleteShader(vsId);
+		glDeleteShader(fsId);
+		glDeleteProgram(pId);
+		
 		glDisableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glDeleteBuffers(vboId);
@@ -99,6 +123,13 @@ public class Screen {
 		totalIndicesAmount = amountOfIndices;
 	}
 	
+	public void fillColorBuffer(float[] buffer, int amountOfColors){
+		colorBuffer = BufferUtils.createFloatBuffer(amountOfColors);
+		colorBuffer.put(buffer);
+		colorBuffer.flip();
+		totalColorAmount = amountOfColors;
+	}
+	
 	public void drawBuffers() {
 		vaoId = glGenVertexArrays();
 		glBindVertexArray(vaoId);
@@ -106,7 +137,14 @@ public class Screen {
 		vboId = glGenBuffers();
 		glBindBuffer(GL_ARRAY_BUFFER, vboId);
 		glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+		glVertexAttribPointer(0, totalVertexAmount, GL_FLOAT, false, 0, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindVertexArray(0);
+		
+		vboCId = glGenBuffers();
+		glBindBuffer(GL_ARRAY_BUFFER, vboCId);
+		glBufferData(GL_ARRAY_BUFFER, colorBuffer, GL_STATIC_DRAW);
+		glVertexAttribPointer(1, totalColorAmount, GL_FLOAT, false, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 		
@@ -114,6 +152,51 @@ public class Screen {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboEId);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		
+		//shader stuff
+		int errorCheckValue = glGetError();
+		vsId = this.loadShader("shaders/shader.vert", GL20.GL_VERTEX_SHADER);
+		fsId = this.loadShader("shaders/shader.frag", GL20.GL_FRAGMENT_SHADER);
+		
+		pId = glCreateProgram();
+		glAttachShader(pId, vsId);
+		glAttachShader(pId, fsId);
+		
+		glBindAttribLocation(pId, 0, "in_Position");
+		glBindAttribLocation(pId, 1, "in_Color");
+		
+		glLinkProgram(pId);
+		glValidateProgram(pId);
+		
+		errorCheckValue = glGetError();
+		if (errorCheckValue != GL_NO_ERROR) {
+			System.out.println("ERROR - Could not create the shaders:" + errorCheckValue);
+			System.exit(-1);
+		}
+	}
+	
+	private int loadShader(String filename, int type) {
+		StringBuilder shaderSource = new StringBuilder();
+		int shaderID = 0;
+		
+		try {
+			BufferedReader reader = new BufferedReader(new FileReader(filename));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				shaderSource.append(line).append("\n");
+			}
+			reader.close();
+		} catch (IOException e) {
+			System.err.println("Could not read file.");
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		
+		shaderID = GL20.glCreateShader(type);
+		glShaderSource(shaderID, shaderSource);
+		glCompileShader(shaderID);
+		
+		return shaderID;
 	}
 
 }
