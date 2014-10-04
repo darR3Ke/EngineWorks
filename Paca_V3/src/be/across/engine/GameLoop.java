@@ -22,9 +22,9 @@ public class GameLoop {
 	private static Game game;												// game object
 	
 	private static final int MAX_FRAME_SKIP = 5;							// maximum aantal frames dat geskipt mag worden als timeDiff 0 is
-	private static long PERIOD = (1L * 1000000000L /10000L) ; 						// 60 updates per seconden omzetten naar nano seconden  
-
-	private static int fps, ups, second = 0;
+	private static long period = 16 * 1000000L; 							// timeframe waarin alles moet gebeuren om de juist fps te behouden. wordt berekend. 60FPS --> 1000(miliseconden)/60 = 16 
+																			// * 1000000L omzetten milliseconds naar nanoseconds
+	
 	
 	public static void main(String[] arghs){
 		initGL();															// initialize openGL
@@ -77,16 +77,7 @@ public class GameLoop {
 			afterTime = System.nanoTime();
 			timeDiff = afterTime - beforeTime;								// kijken hoe lang alles gedraait heeft
 			
-			//debug fps en ups code
-			second +=  timeDiff;											
-			if (second > 1000000000L) {
-				System.out.println("FPS : " + fps + " UPS : " + ups);
-				fps = 0;
-				ups = 0;
-				second = 0;
-			}
-			
-			sleepTime = (PERIOD - timeDiff) ;								// kijken hoeveel sleeptime we moeten gebruiken
+			sleepTime = (period - timeDiff);								// kijken hoeveel sleeptime we moeten gebruiken
 			
 			if (sleepTime > 0) {											// er is tijd over nadat alles is gedaan
 				try {
@@ -96,20 +87,20 @@ public class GameLoop {
 			else {															// er is geen tijd over na alles te doen
 				excess -= sleepTime;										// opslaan van tijd die tekort was om alles te doen
 			}
+			beforeTime = System.nanoTime();
 			
-			beforeTime = System.nanoTime();			
-
-			int skips = 0;
-			while ((excess > PERIOD) && (skips < MAX_FRAME_SKIP)) {
-				gameRender();												// extra game update
-				afterTime = System.nanoTime();
-				timeDiff = afterTime - beforeTime;
-				second += timeDiff;
-				excess -= timeDiff;
-				skips++;
-				beforeTime = System.nanoTime();
+			
+			if (running) {													// check of het spel nog aant draaien is
+				/*
+				 * Als de frame animaties te lang duren om binne de period klaar te geraken gaan we extra game updates zonder frames te renderen en naar het scherm te sturen
+				 */
+				int skips = 0;
+				while ((excess > period) && (skips < MAX_FRAME_SKIP)) {
+					excess -= period;
+					gameUpdate();												// extra game update
+					skips++;
+				}
 			}
-			second += sleepTime ;
 		}
 	}
 	
@@ -141,7 +132,6 @@ public class GameLoop {
 	 * game bewerkingen en opvangen van gebruiker acties
 	 */
 	private static void gameUpdate() {
-		ups++;
 		game.getInput();
 		if (!isPaused && !gameOver){
 			if(Display.isCloseRequested()) {
@@ -158,7 +148,6 @@ public class GameLoop {
 	 * buffer opvullen met crap
 	 */
 	private static void gameRender() {
-		fps++;
 		scherm.render();														// scherm en matrix schoonmaken voor de volgende tekenstap
 		game.render();															// gameobjecten in de matrix zetten
 		
