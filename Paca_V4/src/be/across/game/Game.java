@@ -1,9 +1,11 @@
 package be.across.game;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import be.across.engine.GameFramework;
 import be.across.engine.GameObject;
+import be.across.game.objects.Punt;
 import be.across.game.objects.testTexture;
 
 public class Game implements GameFramework {
@@ -13,8 +15,9 @@ public class Game implements GameFramework {
 	@Override
 	public void init() {
 		
-		objecten.add(new testTexture());
-		
+	//	objecten.add(new testTexture());
+		Random random = new Random();
+		objecten.add(new Punt(random.nextInt(1024), random.nextInt(768)));
 
 	}
 

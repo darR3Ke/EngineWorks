@@ -16,6 +16,7 @@ public class testTexture extends GameObject{
 
 	@Override
 	public void update() {
+		x += 1;
 		
 	}
 

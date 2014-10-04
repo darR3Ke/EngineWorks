@@ -1,4 +1,4 @@
-package be.across.engine.draw;
+package be.across.engine.graphics;
 
 public class Color4f {
 	private float r, g, b, a;
@@ -28,6 +28,22 @@ public class Color4f {
 
 	public float getA() {
 		return a;
+	}
+
+	public void setR(float r) {
+		this.r = r;
+	}
+
+	public void setG(float g) {
+		this.g = g;
+	}
+
+	public void setB(float b) {
+		this.b = b;
+	}
+
+	public void setA(float a) {
+		this.a = a;
 	}
 
 }

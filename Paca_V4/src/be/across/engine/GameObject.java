@@ -1,11 +1,12 @@
 package be.across.engine;
 
-import be.across.engine.draw.Draw;
+import be.across.engine.graphics.Color4f;
+import be.across.engine.graphics.Draw;
 
 public abstract class GameObject {
 	
 	protected float x, y, sx, sy;					// positie X, positie Y, size X, size Y
-	protected float r, g, b, a;						// rood, groen, blauw, alpha
+	protected Color4f color4f;
 	protected String texName;							// texture naam
 	protected boolean texLoaded;					// true als er een texture is
 	
@@ -14,7 +15,7 @@ public abstract class GameObject {
 	
 	public void render(){
 		if (!texLoaded) {
-			Draw.rect(x, y, sx, sy);
+			Draw.rect(x, y, sx, sy, color4f);
 		} else {
 			Draw.tex(x, y, sx, sy, texName);
 		}

@@ -1,15 +1,18 @@
-package be.across.engine.draw;
+package be.across.engine.graphics;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL15.*;
 
 import java.io.IOException;
+import java.nio.FloatBuffer;
 
+import org.lwjgl.BufferUtils;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 
-
 public class Draw {
+
 	
 	private static Texture texture;
 	
@@ -26,22 +29,32 @@ public class Draw {
 	}
 	
 	public static void rect(float x, float y, float width, float height, Color4f kleur, float rot){
-		glPushMatrix(); 													// alles in de matrix op het moment ff op de stack gooien
+//		glPushMatrix(); 													// alles in de matrix op het moment ff op de stack gooien
 		{
-			glTranslatef(x, y, 0); 												// de matrix positioneren
-			glRotatef(rot, 0, 0, 1); 											// de matrix roteren
 			glColor4f(kleur.getR(), kleur.getG(), kleur.getB(), kleur.getA());
 			
-			glBegin(GL_QUADS); 													// beginnen met tekenen in QUADS (4 punten)
-			{
-				glVertex2f(0,0);												//punt tekenen op 0,0
-				glVertex2f(0,height);
-				glVertex2f(width, height);
-				glVertex2f(width,0);
-			}
-			glEnd();
+			FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(AMOUNT_OF_VERTICES * VERTEX_SIZE);
+			vertexBuffer.put(new float[]{x, y, x, y+height, x+width, y+height, x+width, y});
+			vertexBuffer.flip();
+			
+			FloatBuffer colorBuffer = BufferUtils.createFloatBuffer(AMOUNT_OF_VERTICES * COLOR_SIZE);
+			colorBuffer.put(new float[]{kleur.getR(), kleur.getG(), kleur.getB(), 		kleur.getR(), kleur.getG(), kleur.getB(),
+										kleur.getR(), kleur.getG(), kleur.getB(), 		kleur.getR(), kleur.getG(), kleur.getB()    });
+			colorBuffer.flip();
+			
+			int vboVertexId = glGenBuffers();
+			glBindBuffer(GL_ARRAY_BUFFER, vboVertexId);
+			glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			
+			int vboColorId = glGenBuffers();
+			glBindBuffer(GL_ARRAY_BUFFER, vboColorId);
+			glBufferData(GL_ARRAY_BUFFER, colorBuffer, GL_STATIC_DRAW);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			
+
 		}
-		glPopMatrix(); 														// de matrix terug van de stack halen
+//		glPopMatrix(); 														// de matrix terug van de stack halen
 	}
 
 	public static void tex(float x, float y, float width, float height, String texName ) {
