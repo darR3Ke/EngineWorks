@@ -156,8 +156,8 @@ public class GameLoop {
 	 */
 	private static void gameRender() {
 		fps++;
+		game.render();
 		screen.render(); // scherm en matrix schoonmaken voor de volgende tekenstap
-		game.render(); // gameobjecten in de matrix zetten
 
 	}
 

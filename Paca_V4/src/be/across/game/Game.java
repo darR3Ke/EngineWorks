@@ -6,18 +6,17 @@ import java.util.Random;
 import be.across.engine.GameFramework;
 import be.across.engine.GameObject;
 import be.across.game.objects.Punt;
-import be.across.game.objects.testTexture;
 
 public class Game implements GameFramework {
-	
+
 	private ArrayList<GameObject> objecten = new ArrayList<GameObject>();
 
 	@Override
 	public void init() {
-		
-	//	objecten.add(new testTexture());
+
+		// objecten.add(new testTexture());
 		Random random = new Random();
-		objecten.add(new Punt(random.nextInt(1024), random.nextInt(768)));
+		objecten.add(new Punt(random.nextFloat(), random.nextFloat()));
 
 	}
 
@@ -28,7 +27,7 @@ public class Game implements GameFramework {
 
 	@Override
 	public void update() {
-		for(GameObject go: objecten){
+		for (GameObject go : objecten) {
 			go.update();
 		}
 
@@ -36,7 +35,7 @@ public class Game implements GameFramework {
 
 	@Override
 	public void render() {
-		for(GameObject go:objecten){
+		for (GameObject go : objecten) {
 			go.render();
 		}
 

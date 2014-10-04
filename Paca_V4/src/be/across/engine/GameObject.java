@@ -15,9 +15,9 @@ public abstract class GameObject {
 	
 	public void render(){
 		if (!texLoaded) {
-			Draw.rect(x, y, sx, sy, color4f);
+			Draw.rect(x, y, 0, sx, sy, color4f);
 		} else {
-			Draw.tex(x, y, sx, sy, texName);
+//			Draw.tex(x, y, sx, sy, texName);
 		}
 		
 	}
