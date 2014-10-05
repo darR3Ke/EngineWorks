@@ -13,6 +13,8 @@ import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -33,11 +35,7 @@ public class Screen {
 	private int fsId = 0;
 	private int pId = 0;
 
-
-	private static final int VERTEX_SIZE = 4;
-	private static int totalVertexAmount;
 	private static int totalIndicesAmount;
-	private static int totalColorAmount;
 
 	private Screen() { // private constructor voor singleton
 	}
@@ -59,7 +57,7 @@ public class Screen {
 	}
 
 	public void initGL() {
-		glClearColor(0.4f, 0.6f, 0.9f, 0f); // de clear waarde RGB + alpha
+		glClearColor(0f, 0f, 0f, 0f); // de clear waarde RGB + alpha
 	}
 
 	public void render() {
@@ -84,7 +82,7 @@ public class Screen {
 	}
 
 	public void update() {
-		Display.update(); // het scherm updaten
+		Display.update(false); // het scherm updaten
 	}
 
 	public void stop() {
@@ -114,7 +112,6 @@ public class Screen {
 		vertexBuffer = BufferUtils.createFloatBuffer(amountOfVertices);
 		vertexBuffer.put(buffer);
 		vertexBuffer.flip();
-		totalVertexAmount = amountOfVertices;
 	}
 	
 	public void fillIndicesBuffer(byte[] buffer, int amountOfIndices){
@@ -128,7 +125,6 @@ public class Screen {
 		colorBuffer = BufferUtils.createFloatBuffer(amountOfColors);
 		colorBuffer.put(buffer);
 		colorBuffer.flip();
-		totalColorAmount = amountOfColors;
 	}
 	
 	public void drawBuffers() {

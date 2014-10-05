@@ -16,13 +16,14 @@ public class Punt extends GameObject{
 
 	@Override
 	public void update() {
-	/*	this.x = (random.nextFloat()-0.5f)*2;
-		this.y = (random.nextFloat()-0.5f)*2;
-		this.color4f.setA(random.nextFloat());
-		this.color4f.setR(random.nextFloat());
-		this.color4f.setG(random.nextFloat());
-		this.color4f.setB(random.nextFloat());*/
-		
+			
+	}
+	
+	public void moveY(float f){
+		this.y += f;
+	}
+	public void moveX(float f){
+		this.x += f;
 	}
 
 }

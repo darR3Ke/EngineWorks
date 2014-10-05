@@ -8,7 +8,7 @@ import org.lwjgl.opengl.Display;
 import be.across.engine.graphics.Screen;
 import be.across.game.Game;
 
-public class GameLoop {
+public class GameLoop implements Runnable{
 
 	private static final int DISPLAY_WIDTH = 1024;
 	private static final int DISPLAY_HEIGHT = 768;
@@ -25,12 +25,24 @@ public class GameLoop {
 	private static long PERIOD = (1L * 1000000000L / 60L); // 60 updates per seconden omzetten naar nano seconden
 
 	private static int fps, ups, second = 0;
+	
+	private Thread thread;
 
-	public static void main(String[] arghs) {
+	public void start(){
+		running = true;
+		thread = new Thread(this, "GameLoop");
+		thread.start();
+	}
+	
+	public void run() {
 		initGL(); // initialize openGL
 		initGame(); // initialize game paramaters
 		runGame(); // starting the gameLoop
 		cleanUp(); // opruimen van objecten en afsluiten van schermen
+	}
+	
+	public static void main(String[] arghs) {
+		new GameLoop().start();
 	}
 
 	/*
@@ -93,6 +105,7 @@ public class GameLoop {
 				}
 			} else { // er is geen tijd over na alles te doen
 				excess -= sleepTime; // opslaan van tijd die tekort was om alles te doen
+				System.out.println(excess);
 			}
 
 			beforeTime = System.nanoTime();
@@ -139,7 +152,11 @@ public class GameLoop {
 	 */
 	private static void gameUpdate() {
 		ups++;
+		Display.processMessages();
+		Mouse.poll();
+		Keyboard.poll();
 		game.getInput();
+		
 		if (!isPaused && !gameOver) {
 			if (Display.isCloseRequested()) {
 				stopGame();
