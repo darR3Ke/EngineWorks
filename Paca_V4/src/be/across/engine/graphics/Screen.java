@@ -1,6 +1,7 @@
 package be.across.engine.graphics;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.opengl.GL15.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
@@ -13,8 +14,6 @@ import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.LWJGLException;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.ContextAttribs;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
@@ -24,12 +23,15 @@ import org.lwjgl.opengl.PixelFormat;
 public class Screen {
 	private static final Screen instance = new Screen(); // Screen object aanmaken
 	private FloatBuffer vertexBuffer;
+	private FloatBuffer vBuffer;
 	private ByteBuffer indicesBuffer;
 	private FloatBuffer colorBuffer;
 	private int vaoId = 0;
 	private int vboId = 0;
 	private int vboCId = 0;
 	private int vboIId = 0;
+	
+	private int textureId;
 	
 	private int vsId = 0;
 	private int fsId = 0;
@@ -65,10 +67,14 @@ public class Screen {
 		glClear(GL_COLOR_BUFFER_BIT); // scherm schoonmaken
 		
 		glUseProgram(pId);
+		
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textureId);
 
 		glBindVertexArray(vaoId);
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIId);
 		glDrawElements(GL_TRIANGLES, totalIndicesAmount, GL_UNSIGNED_BYTE, 0);
@@ -76,6 +82,7 @@ public class Screen {
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(2);
 		glBindVertexArray(0);
 
 		glUseProgram(0);
@@ -114,6 +121,18 @@ public class Screen {
 		vertexBuffer.flip();
 	}
 	
+	public void fillColorBuffer(float[] buffer, int amountOfColors){
+		colorBuffer = BufferUtils.createFloatBuffer(amountOfColors);
+		colorBuffer.put(buffer);
+		colorBuffer.flip();
+	}
+	
+	public void fillBuffer(float[] buffer, int bufferSize){
+		vBuffer = BufferUtils.createFloatBuffer(bufferSize);
+		vBuffer.put(buffer);
+		vBuffer.flip();
+	}
+	
 	public void fillIndicesBuffer(byte[] buffer, int amountOfIndices){
 		indicesBuffer = BufferUtils.createByteBuffer(amountOfIndices);
 		indicesBuffer.put(buffer);
@@ -121,10 +140,8 @@ public class Screen {
 		totalIndicesAmount = amountOfIndices;
 	}
 	
-	public void fillColorBuffer(float[] buffer, int amountOfColors){
-		colorBuffer = BufferUtils.createFloatBuffer(amountOfColors);
-		colorBuffer.put(buffer);
-		colorBuffer.flip();
+	public void setTexture(int textureId){
+		this.textureId = textureId;
 	}
 	
 	public void drawBuffers() {
@@ -133,16 +150,11 @@ public class Screen {
 
 		vboId = glGenBuffers();
 		glBindBuffer(GL_ARRAY_BUFFER, vboId);
-		glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, 4, GL_FLOAT, false, 0, 0);
+		glBufferData(GL_ARRAY_BUFFER, vBuffer, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 4, GL_FLOAT, false, (4*4)+(4*4)+(4*2), 0);		// teken punten 
+		glVertexAttribPointer(1, 4, GL_FLOAT, false, (4*4)+(4*4)+(4*2), 0+(4*4));		// kleuren 
+		glVertexAttribPointer(2, 2, GL_FLOAT, false, (4*4)+(4*4)+(4*2) ,0+(4*4)+(4*4));		// textures
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		
-		vboCId = glGenBuffers();
-		glBindBuffer(GL_ARRAY_BUFFER, vboCId);
-		glBufferData(GL_ARRAY_BUFFER, colorBuffer, GL_STATIC_DRAW);
-		glVertexAttribPointer(1, 4, GL_FLOAT, false, 0, 0);
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
 		
 		vboIId = glGenBuffers();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIId);
@@ -159,6 +171,7 @@ public class Screen {
 		
 		glBindAttribLocation(pId, 0, "in_Position");
 		glBindAttribLocation(pId, 1, "in_Color");
+		glBindAttribLocation(pId, 2, "in_TextureCoord");
 		
 		glLinkProgram(pId);
 		glValidateProgram(pId);
@@ -181,7 +194,7 @@ public class Screen {
 			System.exit(-1);
 		}
 		
-		shaderID = GL20.glCreateShader(type);
+		shaderID = glCreateShader(type);
 		glShaderSource(shaderID, shaderSource);
 		glCompileShader(shaderID);
 		
