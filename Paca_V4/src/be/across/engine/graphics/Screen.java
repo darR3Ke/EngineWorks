@@ -27,7 +27,7 @@ public class Screen {
 	private int vaoId = 0;
 	private int vboId = 0;
 	private int vboCId = 0;
-	private int vboEId = 0;
+	private int vboIId = 0;
 	
 	private int vsId = 0;
 	private int fsId = 0;
@@ -51,19 +51,20 @@ public class Screen {
 			Display.setDisplayMode(new DisplayMode(width, height)); // resolutie zetten van scherm obj
 			Display.setTitle(title); // titel zetten van scherm obj
 			ContextAttribs context = new ContextAttribs(3, 3); // context van GL libraries zetten naar openGL API 3.3
-			Display.create(new PixelFormat(), context.withProfileCore(true)); // aanmaken van scherm obj
+			Display.create(new PixelFormat(), context.withProfileCore(true).withForwardCompatible(true)); // aanmaken van scherm obj
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 		}
+		glViewport(0, 0, width, height);
 	}
 
 	public void initGL() {
-		glClearColor(0, 0, 0, 0); // de clear waarde RGB + alpha
+		glClearColor(0.4f, 0.6f, 0.9f, 0f); // de clear waarde RGB + alpha
 	}
 
 	public void render() {
 
-	//	glClear(GL_COLOR_BUFFER_BIT); // scherm schoonmaken
+		glClear(GL_COLOR_BUFFER_BIT); // scherm schoonmaken
 		
 		glUseProgram(pId);
 
@@ -71,7 +72,7 @@ public class Screen {
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboEId);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIId);
 		glDrawElements(GL_TRIANGLES, totalIndicesAmount, GL_UNSIGNED_BYTE, 0);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -100,7 +101,7 @@ public class Screen {
 		glDeleteBuffers(vboId);
 		
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glDeleteBuffers(vboEId);
+		glDeleteBuffers(vboIId);
 		
 		glBindVertexArray(0);
 		glDeleteBuffers(vaoId);
@@ -110,7 +111,7 @@ public class Screen {
 
 	
 	public void fillVertexBuffer(float[] buffer, int amountOfVertices){
-		vertexBuffer = BufferUtils.createFloatBuffer(amountOfVertices * VERTEX_SIZE);
+		vertexBuffer = BufferUtils.createFloatBuffer(amountOfVertices);
 		vertexBuffer.put(buffer);
 		vertexBuffer.flip();
 		totalVertexAmount = amountOfVertices;
@@ -137,24 +138,22 @@ public class Screen {
 		vboId = glGenBuffers();
 		glBindBuffer(GL_ARRAY_BUFFER, vboId);
 		glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STATIC_DRAW);
-		glVertexAttribPointer(0, totalVertexAmount, GL_FLOAT, false, 0, 0);
+		glVertexAttribPointer(0, 4, GL_FLOAT, false, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
 		
 		vboCId = glGenBuffers();
 		glBindBuffer(GL_ARRAY_BUFFER, vboCId);
 		glBufferData(GL_ARRAY_BUFFER, colorBuffer, GL_STATIC_DRAW);
-		glVertexAttribPointer(1, totalColorAmount, GL_FLOAT, false, 0, 0);
+		glVertexAttribPointer(1, 4, GL_FLOAT, false, 0, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 		
-		vboEId = glGenBuffers();
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboEId);
+		vboIId = glGenBuffers();
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIId);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL_STATIC_DRAW);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		
 		//shader stuff
-		int errorCheckValue = glGetError();
 		vsId = this.loadShader("shaders/shader.vert", GL20.GL_VERTEX_SHADER);
 		fsId = this.loadShader("shaders/shader.frag", GL20.GL_FRAGMENT_SHADER);
 		
@@ -167,12 +166,6 @@ public class Screen {
 		
 		glLinkProgram(pId);
 		glValidateProgram(pId);
-		
-		errorCheckValue = glGetError();
-		if (errorCheckValue != GL_NO_ERROR) {
-			System.out.println("ERROR - Could not create the shaders:" + errorCheckValue);
-			System.exit(-1);
-		}
 	}
 	
 	private int loadShader(String filename, int type) {

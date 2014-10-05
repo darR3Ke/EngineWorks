@@ -15,7 +15,6 @@ public class Draw {
 	}
 
 	public static void rect(float x, float y, float z, float width, float height, Color4f color, float rot) {
-		final int AMOUNT_OF_VERTICES = 4;
 
 		float[] vertices = { // ondersste driehoek
 								x, y + height, z, 1f, 				// ID: 0
@@ -31,11 +30,11 @@ public class Draw {
 		float[] colors = { color.getR(), color.getG(), color.getB(), color.getA(), 
 							color.getR(), color.getG(), color.getB(), color.getA(), 
 							color.getR(), color.getG(), color.getB(), color.getA(), 
-							color.getR(), color.getG(), color.getB(), color.getA() };
+							color.getR(), color.getG(), color.getB(), color.getA(), };
 		
 		
 		Screen screen = Screen.getInstance();
-		screen.fillVertexBuffer(vertices, AMOUNT_OF_VERTICES);
+		screen.fillVertexBuffer(vertices, vertices.length);
 		screen.fillIndicesBuffer(indices, indices.length);
 		screen.fillColorBuffer(colors, colors.length);
 		screen.drawBuffers();

@@ -5,6 +5,7 @@ import java.util.Random;
 
 import be.across.engine.GameFramework;
 import be.across.engine.GameObject;
+import be.across.engine.graphics.Color4f;
 import be.across.game.objects.Punt;
 
 public class Game implements GameFramework {
@@ -15,8 +16,7 @@ public class Game implements GameFramework {
 	public void init() {
 
 		// objecten.add(new testTexture());
-		Random random = new Random();
-		objecten.add(new Punt(random.nextFloat(), random.nextFloat()));
+		objecten.add(new Punt(-0.5f, -0.5f, 1f, 1f, new Color4f(1f, 0f, 0f, 1.0f)));
 
 	}
 
